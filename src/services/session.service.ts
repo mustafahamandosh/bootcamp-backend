@@ -3,6 +3,7 @@ import { compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import User from '../models/User';
 import authentication from '../config/authentication';
+import AppError from '../errors/AppError';
 
 interface Request {
   email: string;
@@ -25,7 +26,7 @@ export default class SessionService {
     });
 
     if (!user) {
-      throw new Error('Incorrect email or password');
+      throw new AppError('Incorrect email or password', 401);
     }
 
     // user.password - senha criptografia
@@ -33,7 +34,7 @@ export default class SessionService {
     const isPasswordMatched = await compare(password, <string>user.password);
 
     if (!isPasswordMatched) {
-      throw new Error('Incorrect email or password');
+      throw new AppError('Incorrect email or password', 401);
     }
 
     const { secretKey, expiresIn } = authentication.jwt;
